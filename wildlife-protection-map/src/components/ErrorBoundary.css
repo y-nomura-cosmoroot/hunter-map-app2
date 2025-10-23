@@ -1,0 +1,127 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin: 1rem;
+}
+
+.error-boundary-content {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-boundary h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.error-boundary p {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.retry-button,
+.reload-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.retry-button.primary:hover {
+  background-color: #0056b3;
+}
+
+.reload-button.secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.reload-button.secondary:hover {
+  background-color: #545b62;
+}
+
+.error-details {
+  text-align: left;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #495057;
+}
+
+.error-details summary:hover {
+  color: #007bff;
+}
+
+.error-stack h4 {
+  margin: 1rem 0 0.5rem 0;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.error-stack pre {
+  background-color: #f1f3f4;
+  padding: 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #495057;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .error-boundary {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .retry-button,
+  .reload-button {
+    width: 100%;
+    max-width: 200px;
+  }
+}

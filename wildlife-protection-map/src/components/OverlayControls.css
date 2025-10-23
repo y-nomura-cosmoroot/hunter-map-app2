@@ -1,0 +1,337 @@
+.overlay-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.controls-section {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.controls-section h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+/* 座標入力フィールド */
+.coordinate-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.input-group input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.input-group input:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group input.error {
+  border-color: #dc3545;
+}
+
+.input-group input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* 微調整コントロール */
+.fine-tuning {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.fine-tuning p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.direction-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.horizontal-controls {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.direction-btn {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #ced4da;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #495057;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.direction-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.direction-btn:active {
+  background: #dee2e6;
+  transform: translateY(1px);
+}
+
+.fine-tuning-amounts {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.fine-tuning-amounts button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ced4da;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #495057;
+  transition: all 0.15s ease-in-out;
+}
+
+.fine-tuning-amounts button:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* 透明度コントロール */
+.opacity-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.opacity-control label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.opacity-slider {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e9ecef;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.opacity-slider::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.opacity-presets {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.opacity-presets button {
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #ced4da;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #495057;
+  transition: all 0.15s ease-in-out;
+}
+
+.opacity-presets button:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* 設定管理 */
+.config-save,
+.config-load {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.config-load {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.config-save .input-group,
+.config-load .input-group {
+  margin-bottom: 0.5rem;
+}
+
+.config-save select,
+.config-load select {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: white;
+  cursor: pointer;
+}
+
+.save-btn,
+.load-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #007bff;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+.save-btn:hover,
+.load-btn:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.save-btn:disabled,
+.load-btn:disabled {
+  background: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.save-btn:disabled:hover,
+.load-btn:disabled:hover {
+  background: #6c757d;
+  border-color: #6c757d;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .overlay-controls {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+  
+  .controls-section {
+    padding: 0.75rem;
+  }
+  
+  .coordinate-inputs {
+    gap: 0.75rem;
+  }
+  
+  .direction-controls {
+    gap: 0.5rem;
+  }
+  
+  .horizontal-controls {
+    gap: 1.5rem;
+  }
+  
+  .direction-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.875rem;
+  }
+}/* 設定管理
+ボタン */
+.config-management {
+  margin-top: 12px;
+}
+
+.manage-configs-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.manage-configs-btn:hover {
+  background-color: #1976d2;
+}
+
+.manage-configs-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

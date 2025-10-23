@@ -1,0 +1,348 @@
+.config-manager-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.config-manager {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.config-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.config-manager-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* ストレージ情報 */
+.storage-info {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.storage-info h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.storage-stats {
+  margin-bottom: 10px;
+}
+
+.storage-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.storage-usage {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50 0%, #ff9800 70%, #f44336 90%);
+  transition: width 0.3s ease;
+}
+
+.storage-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.storage-info p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 設定一覧 */
+.config-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.config-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 10px 20px;
+}
+
+.config-list-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.clear-all-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.clear-all-button:hover {
+  background-color: #d32f2f;
+}
+
+.no-configs {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.no-configs p {
+  margin: 10px 0;
+}
+
+.config-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 20px 20px;
+}
+
+.config-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.2s;
+  background-color: white;
+}
+
+.config-item:hover {
+  border-color: #2196f3;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
+.config-item.selected {
+  border-color: #2196f3;
+  background-color: #f3f8ff;
+}
+
+.config-info {
+  flex: 1;
+}
+
+.config-info h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.config-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-details span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.config-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.load-button,
+.delete-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  min-width: 80px;
+}
+
+.load-button {
+  background-color: #2196f3;
+  color: white;
+}
+
+.load-button:hover:not(:disabled) {
+  background-color: #1976d2;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-button:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.load-button:disabled,
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* エラーメッセージ */
+.error-message {
+  padding: 16px 20px;
+  background-color: #ffebee;
+  border-top: 1px solid #e0e0e0;
+  color: #c62828;
+  font-size: 0.9rem;
+}
+
+/* 確認ダイアログ */
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.confirm-dialog {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-dialog h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.confirm-dialog p {
+  margin: 0 0 20px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.cancel-button,
+.confirm-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-button:hover {
+  background-color: #d0d0d0;
+}
+
+.confirm-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.confirm-button:hover {
+  background-color: #d32f2f;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .config-manager {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .config-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .config-actions {
+    margin-left: 0;
+    margin-top: 12px;
+    justify-content: flex-end;
+  }
+  
+  .storage-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .config-list-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}

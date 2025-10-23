@@ -1,0 +1,215 @@
+.error-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 400px;
+  min-width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.error-notification.show {
+  transform: translateX(0);
+}
+
+.error-notification.hide {
+  transform: translateX(100%);
+}
+
+/* 重要度別のスタイル */
+.error-notification.low {
+  border-left: 4px solid #ffc107;
+}
+
+.error-notification.medium {
+  border-left: 4px solid #fd7e14;
+}
+
+.error-notification.high {
+  border-left: 4px solid #dc3545;
+}
+
+.error-notification.critical {
+  border-left: 4px solid #6f42c1;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3); }
+  100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+}
+
+.error-notification-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  gap: 12px;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.error-message {
+  flex: 1;
+  min-width: 0;
+}
+
+.error-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.error-description {
+  font-size: 0.85rem;
+  color: #6c757d;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.action-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 60px;
+}
+
+.action-button.retry {
+  background-color: #007bff;
+  color: white;
+}
+
+.action-button.retry:hover {
+  background-color: #0056b3;
+}
+
+.action-button.clear {
+  background-color: #dc3545;
+  color: white;
+}
+
+.action-button.clear:hover {
+  background-color: #c82333;
+}
+
+.action-button.dismiss {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  font-weight: bold;
+}
+
+.action-button.dismiss:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+/* プログレスバー */
+.error-progress-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  animation: progress linear;
+  transform-origin: left;
+}
+
+@keyframes progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .error-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    min-width: auto;
+  }
+  
+  .error-notification-content {
+    padding: 12px;
+  }
+  
+  .error-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .action-button {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    min-width: 50px;
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .error-notification {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .error-title {
+    color: #f7fafc;
+  }
+  
+  .error-description {
+    color: #a0aec0;
+  }
+  
+  .action-button.dismiss {
+    background-color: #4a5568;
+    color: #e2e8f0;
+    border-color: #2d3748;
+  }
+  
+  .action-button.dismiss:hover {
+    background-color: #2d3748;
+  }
+}
+
+/* アクセシビリティ */
+@media (prefers-reduced-motion: reduce) {
+  .error-notification {
+    transition: none;
+  }
+  
+  .error-notification.critical {
+    animation: none;
+  }
+  
+  .error-progress-bar {
+    animation: none;
+  }
+}
+
+/* フォーカス管理 */
+.action-button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.action-button:focus:not(:focus-visible) {
+  outline: none;
+}
