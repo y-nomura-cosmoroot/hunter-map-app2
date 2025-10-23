@@ -3,7 +3,8 @@ import {
   GoogleMap,
   LoadScript,
   Marker,
-  GroundOverlay
+  GroundOverlay,
+  Circle
 } from '@react-google-maps/api';
 import type { MapPoint, OverlayConfig, PDFPoint } from '../types';
 import { generateHighQualityPDFImage } from '../utils/pdfToImage';
@@ -13,6 +14,7 @@ import {
 } from '../utils/coordinateTransform';
 import { getPDFPageSize } from '../utils/pdfToImage';
 import { handleError, reportError } from '../utils/errorHandler';
+import { getCurrentLocationMarkerOptions, getReferencePointMarkerOptions } from '../utils/mapIcons';
 import './GoogleMapComponent.css';
 
 interface GoogleMapComponentProps {
@@ -24,6 +26,7 @@ interface GoogleMapComponentProps {
   pdfPoints: PDFPoint[];
   onOverlayCreated: (config: OverlayConfig) => void;
   onOverlayError: (error: string) => void;
+  userLocation?: { lat: number; lng: number; accuracy?: number } | null;
 }
 
 // 三重県の中心座標
@@ -39,7 +42,7 @@ const mapContainerStyle = {
 const mapOptions = {
   center: mieCenter,
   zoom: 10,
-  mapTypeId: 'hybrid',
+  mapTypeId: 'roadmap', // 地図表示に変更
   mapTypeControl: true,
   streetViewControl: false,
   fullscreenControl: true,
@@ -67,6 +70,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   pdfPoints,
   onOverlayCreated,
   onOverlayError,
+  userLocation,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +93,17 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
   }, []);
+
+  // 現在位置が更新されたときにマップの中心を移動
+  useEffect(() => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.panTo({ lat: userLocation.lat, lng: userLocation.lng });
+      // ズームレベルを調整（現在位置が見つかった場合は少しズームイン）
+      if (mapRef.current.getZoom() && mapRef.current.getZoom()! < 14) {
+        mapRef.current.setZoom(14);
+      }
+    }
+  }, [userLocation]);
 
   // オーバーレイ作成処理
   useEffect(() => {
@@ -136,7 +151,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
 
         // オーバーレイ設定を作成
         const config: OverlayConfig = {
-          id: `overlay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `overlay_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
           name: `${pdfFile.name} - ${new Date().toLocaleString()}`,
           pdfFile: {
             name: pdfFile.name,
@@ -252,21 +267,32 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
             <Marker
               key={`marker-${index}`}
               position={{ lat: point.lat, lng: point.lng }}
-              label={{
-                text: `${index + 1}`,
-                color: 'white',
-                fontWeight: 'bold',
-              }}
-              icon={{
-                path: window.google?.maps?.SymbolPath?.CIRCLE || 0,
-                scale: 15,
-                fillColor: index === selectedPointIndex ? '#ff4444' : '#4285f4',
-                fillOpacity: 1,
-                strokeColor: 'white',
-                strokeWeight: 2,
-              }}
+              {...getReferencePointMarkerOptions(index + 1, index === selectedPointIndex)}
             />
           ))}
+
+          {/* 現在位置の精度円 */}
+          {userLocation && userLocation.accuracy && userLocation.accuracy > 10 && (
+            <Circle
+              center={{ lat: userLocation.lat, lng: userLocation.lng }}
+              radius={userLocation.accuracy}
+              options={{
+                fillColor: '#1a73e8',
+                fillOpacity: 0.08,
+                strokeColor: '#1a73e8',
+                strokeOpacity: 0.25,
+                strokeWeight: 1,
+              }}
+            />
+          )}
+
+          {/* 現在位置マーカー（点滅アニメーション付き） */}
+          {userLocation && (
+            <Marker
+              position={{ lat: userLocation.lat, lng: userLocation.lng }}
+              {...getCurrentLocationMarkerOptions(true)}
+            />
+          )}
 
           {/* Ground Overlay */}
           {overlayImageUrl && overlayBounds && (

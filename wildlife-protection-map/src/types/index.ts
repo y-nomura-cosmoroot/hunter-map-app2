@@ -11,6 +11,14 @@ export interface MapPoint {
   lng: number;
 }
 
+// 現在位置の型定義
+export interface UserLocation {
+  lat: number;
+  lng: number;
+  accuracy?: number;
+  timestamp: number;
+}
+
 // オーバーレイ設定の型定義
 export interface OverlayConfig {
   id: string;
@@ -42,6 +50,9 @@ export interface ApplicationState {
   currentStep: number; // 0-5: アップロード→基準点設定(3回)→オーバーレイ→調整
   overlay: OverlayConfig | null;
   savedConfigs: OverlayConfig[];
+  userLocation: UserLocation | null;
+  isLocationLoading: boolean;
+  locationError: string | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -64,6 +75,10 @@ export type ApplicationAction =
   | { type: 'DELETE_CONFIG'; payload: string }
   | { type: 'LOAD_SAVED_CONFIGS'; payload: OverlayConfig[] }
   | { type: 'CLEAR_ALL_CONFIGS' }
+  | { type: 'SET_USER_LOCATION'; payload: UserLocation }
+  | { type: 'SET_LOCATION_LOADING'; payload: boolean }
+  | { type: 'SET_LOCATION_ERROR'; payload: string | null }
+  | { type: 'CLEAR_USER_LOCATION' }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET_STATE' };

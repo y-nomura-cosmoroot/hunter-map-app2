@@ -54,6 +54,38 @@
   100% { transform: rotate(360deg); }
 }
 
+/* 現在位置マーカーの点滅アニメーション */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.current-location-marker {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* 現在位置の精度円のアニメーション */
+@keyframes ripple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0.1;
+    transform: scale(1.2);
+  }
+}
+
 .google-map-error {
   display: flex;
   align-items: center;

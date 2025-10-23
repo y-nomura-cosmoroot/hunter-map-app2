@@ -11,6 +11,9 @@ export const initialState: ApplicationState = {
   currentStep: STEPS.PDF_UPLOAD,
   overlay: null,
   savedConfigs: [],
+  userLocation: null,
+  isLocationLoading: false,
+  locationError: null,
   isLoading: false,
   error: null,
 };
@@ -204,6 +207,36 @@ export function applicationReducer(
         ...state,
         error: action.payload,
         isLoading: false,
+      };
+
+    case 'SET_USER_LOCATION':
+      return {
+        ...state,
+        userLocation: action.payload,
+        isLocationLoading: false,
+        locationError: null,
+      };
+
+    case 'SET_LOCATION_LOADING':
+      return {
+        ...state,
+        isLocationLoading: action.payload,
+        locationError: action.payload ? null : state.locationError,
+      };
+
+    case 'SET_LOCATION_ERROR':
+      return {
+        ...state,
+        locationError: action.payload,
+        isLocationLoading: false,
+      };
+
+    case 'CLEAR_USER_LOCATION':
+      return {
+        ...state,
+        userLocation: null,
+        isLocationLoading: false,
+        locationError: null,
       };
 
     case 'RESET_STATE':

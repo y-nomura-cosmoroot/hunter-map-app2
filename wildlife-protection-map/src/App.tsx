@@ -9,7 +9,8 @@ import {
   GoogleMapComponent, 
   OverlayControls,
   ErrorBoundary,
-  ErrorNotification
+  ErrorNotification,
+  LocationControls
 } from './components'
 import './components/PDFUploader.css'
 import './components/PDFViewer.css'
@@ -18,6 +19,7 @@ import './components/GoogleMapComponent.css'
 import './components/OverlayControls.css'
 import './components/ErrorBoundary.css'
 import './components/ErrorNotification.css'
+import './components/LocationControls.css'
 import { handleError, reportError } from './utils/errorHandler'
 import { clearPDFCache, getMemoryStats } from './utils/pdfToImage'
 
@@ -169,6 +171,12 @@ function App() {
     dispatch({ type: 'SET_ERROR', payload: null });
   }, [dispatch]);
 
+  // 位置情報が見つかったときのハンドラー（メモ化）
+  const handleLocationFound = useCallback((lat: number, lng: number) => {
+    // 位置情報が見つかったことをログに記録
+    console.log(`現在位置が見つかりました: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+  }, []);
+
   // 現在選択中の基準点インデックスを取得（メモ化）
   const selectedPointIndex = useMemo((): number => {
     if (state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3) {
@@ -212,6 +220,11 @@ function App() {
                 </div>
               </div>
               <div className="control-panel">
+                {/* 位置情報コントロール */}
+                <ErrorBoundary>
+                  <LocationControls onLocationFound={handleLocationFound} />
+                </ErrorBoundary>
+                
                 {state.currentStep === STEPS.PDF_UPLOAD && (
                   <p>PDFファイルをアップロードして開始してください。</p>
                 )}
@@ -325,6 +338,7 @@ function App() {
                       pdfPoints={state.referencePoints.pdf}
                       onOverlayCreated={handleOverlayCreated}
                       onOverlayError={handleOverlayError}
+                      userLocation={state.userLocation}
                     />
                   </ErrorBoundary>
                 </div>
