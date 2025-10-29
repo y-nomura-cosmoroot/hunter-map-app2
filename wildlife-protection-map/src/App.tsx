@@ -2,11 +2,11 @@ import './App.css'
 import { useCallback, useMemo, useEffect, useState } from 'react'
 import { useApplicationState, useApplicationDispatch } from './store'
 import { STEPS } from './types'
-import { 
-  PDFUploader, 
-  PDFViewer, 
-  ReferencePointManager, 
-  GoogleMapComponent, 
+import {
+  PDFUploader,
+  PDFViewer,
+  ReferencePointManager,
+  GoogleMapComponent,
   OverlayControls,
   ErrorBoundary,
   ErrorNotification,
@@ -37,7 +37,7 @@ function App() {
     console.log('STEPS.OVERLAY_ADJUSTMENT:', STEPS.OVERLAY_ADJUSTMENT);
     console.log('条件チェック - OVERLAY_CREATION:', state.currentStep === STEPS.OVERLAY_CREATION);
     console.log('条件チェック - OVERLAY_ADJUSTMENT:', state.currentStep === STEPS.OVERLAY_ADJUSTMENT && !!state.overlay);
-    
+
     // 詳細なデバッグ情報
     if (import.meta.env.DEV) {
       debugAppState(state);
@@ -77,12 +77,12 @@ function App() {
     try {
       if (state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3) {
         const currentIndex = state.currentStep - STEPS.REFERENCE_POINT_1;
-        
+
         // 現在のインデックスに対応するPDF基準点がまだ設定されていない場合のみ追加
         if (!state.referencePoints.pdf[currentIndex]) {
-          dispatch({ 
-            type: 'ADD_PDF_POINT', 
-            payload: { x, y, pageNumber } 
+          dispatch({
+            type: 'ADD_PDF_POINT',
+            payload: { x, y, pageNumber }
           });
         }
       }
@@ -98,12 +98,12 @@ function App() {
     try {
       if (state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3) {
         const currentIndex = state.currentStep - STEPS.REFERENCE_POINT_1;
-        
+
         // 対応するPDF基準点が設定されており、地図基準点がまだ設定されていない場合のみ追加
         if (state.referencePoints.pdf[currentIndex] && !state.referencePoints.map[currentIndex]) {
-          dispatch({ 
-            type: 'ADD_MAP_POINT', 
-            payload: { lat, lng } 
+          dispatch({
+            type: 'ADD_MAP_POINT',
+            payload: { lat, lng }
           });
         }
       }
@@ -174,6 +174,20 @@ function App() {
     }
   }, [dispatch]);
 
+  // 設定保存成功時のハンドラー（メモ化）
+  const handleSaveSuccess = useCallback(() => {
+    try {
+      // 1秒待ってからパネルを閉じてGoogleMapを全体表示
+      setTimeout(() => {
+        dispatch({ type: 'SET_PANEL_VISIBILITY', payload: false });
+      }, 1000);
+    } catch (error) {
+      const appError = handleError(error, 'handleSaveSuccess');
+      reportError(appError);
+      dispatch({ type: 'SET_ERROR', payload: appError.userMessage });
+    }
+  }, [dispatch]);
+
   // エラー通知の閉じるハンドラー（メモ化）
   const handleErrorDismiss = useCallback(() => {
     dispatch({ type: 'SET_ERROR', payload: null });
@@ -233,7 +247,7 @@ function App() {
             </div>
           </div>
         </header>
-        
+
         <div className="app-body">
           <aside className={`app-sidebar ${state.isPanelVisible ? 'visible' : 'hidden'}`}>
             <div className="sidebar-content">
@@ -273,7 +287,7 @@ function App() {
                 {/* ステップ4: 調整 */}
                 <div className={`step ${state.currentStep === STEPS.OVERLAY_ADJUSTMENT ? 'active' : ''}`}>
                   <span className="step-number">3</span>
-                  <span className="step-label">調整</span>
+                  <span className="step-label">調整、保存確認</span>
                 </div>
                 {/* 強制的な条件チェック */}
                 {(() => {
@@ -284,7 +298,7 @@ function App() {
                     stepMatch: state.currentStep === STEPS.OVERLAY_ADJUSTMENT,
                     finalCondition: state.currentStep === STEPS.OVERLAY_ADJUSTMENT && state.overlay
                   });
-                  
+
                   if (state.currentStep === STEPS.OVERLAY_ADJUSTMENT && state.overlay) {
                     try {
                       console.log('レンダリング開始...');
@@ -296,11 +310,12 @@ function App() {
                             onPositionChange={handlePositionChange}
                             onOpacityChange={handleOpacityChange}
                             savedConfigs={state.savedConfigs}
+                            onSaveSuccess={handleSaveSuccess}
                           />
                         </ErrorBoundary>
                       );
                       let result = overlay;
-                      if(import.meta.env.VITE_DEBUG_MODE === "TRUE"){
+                      if (import.meta.env.VITE_DEBUG_MODE === "TRUE") {
                         result = (
                           <div>
                             <p>デバッグ: OverlayControlsを表示中</p>
@@ -330,21 +345,21 @@ function App() {
                       );
                     }
                   }
-                  
+
                   return null;
                 })()}
                 {/* デバッグ情報 */}
                 {import.meta.env.VITE_DEBUG_MODE === "TRUE" &&
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-                  <p>現在のステップ: {state.currentStep}</p>
-                  <p>オーバーレイ: {state.overlay ? 'あり' : 'なし'}</p>
-                  <p>OVERLAY_ADJUSTMENT: {STEPS.OVERLAY_ADJUSTMENT}</p>
-                </div>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+                    <p>現在のステップ: {state.currentStep}</p>
+                    <p>オーバーレイ: {state.overlay ? 'あり' : 'なし'}</p>
+                    <p>OVERLAY_ADJUSTMENT: {STEPS.OVERLAY_ADJUSTMENT}</p>
+                  </div>
                 }
               </div>
             </div>
           </aside>
-          
+
           <main className="app-main">
             <div className="main-content">
               <div className={`content-area ${state.isPanelVisible ? 'split-view' : 'map-only'}`}>
@@ -366,7 +381,7 @@ function App() {
                     )}
                   </ErrorBoundary>
                 </div>
-                
+
                 <div className="map-section">
                   <h3>Googleマップ</h3>
                   <ErrorBoundary>

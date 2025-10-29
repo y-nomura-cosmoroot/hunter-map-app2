@@ -9,6 +9,7 @@ interface OverlayControlsProps {
   onPositionChange: (lat: number, lng: number) => void;
   onOpacityChange: (opacity: number) => void;
   savedConfigs: OverlayConfig[];
+  onSaveSuccess?: () => void; // 保存成功時のコールバック
 }
 
 const OverlayControls: React.FC<OverlayControlsProps> = ({
@@ -16,6 +17,7 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
   onPositionChange,
   onOpacityChange,
   savedConfigs,
+  onSaveSuccess,
 }) => {
   console.log('OverlayControls初期化開始:', { overlay, savedConfigs });
 
@@ -90,6 +92,11 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
       setSaveMessage('設定を保存しました');
       setConfigName(''); // 保存後は名前をクリア
 
+      // 保存成功時のコールバックを呼び出し
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
+
       setTimeout(() => setSaveMessage(''), 3000);
     } catch (error) {
       const appError = handleError(error, 'OverlayControls.handleSaveConfig');
@@ -151,49 +158,50 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
       </div>
 
       {/* 位置微調整 */}
-      <div className="controls-section">
-        <h4>位置微調整</h4>
-        <div className="fine-tuning-controls">
-          <div className="direction-controls">
-            <button
-              className="direction-btn north"
-              onClick={() => handleFineTuning('north')}
-              title="北へ移動"
-            >
-              ↑
-            </button>
-            <div className="horizontal-controls">
+      {import.meta.env.VITE_DEBUG_MODE === "TRUE" &&
+        <div className="controls-section">
+          <h4>位置微調整</h4>
+          <div className="fine-tuning-controls">
+            <div className="direction-controls">
               <button
-                className="direction-btn west"
-                onClick={() => handleFineTuning('west')}
-                title="西へ移動"
+                className="direction-btn north"
+                onClick={() => handleFineTuning('north')}
+                title="北へ移動"
               >
-                ←
+                ↑
               </button>
+              <div className="horizontal-controls">
+                <button
+                  className="direction-btn west"
+                  onClick={() => handleFineTuning('west')}
+                  title="西へ移動"
+                >
+                  ←
+                </button>
+                <button
+                  className="direction-btn east"
+                  onClick={() => handleFineTuning('east')}
+                  title="東へ移動"
+                >
+                  →
+                </button>
+              </div>
               <button
-                className="direction-btn east"
-                onClick={() => handleFineTuning('east')}
-                title="東へ移動"
+                className="direction-btn south"
+                onClick={() => handleFineTuning('south')}
+                title="南へ移動"
               >
-                →
+                ↓
               </button>
             </div>
-            <button
-              className="direction-btn south"
-              onClick={() => handleFineTuning('south')}
-              title="南へ移動"
-            >
-              ↓
-            </button>
-          </div>
-          <div className="fine-tuning-amounts">
-            <button onClick={() => handleFineTuning('north', 0.0001)}>小 (0.0001°)</button>
-            <button onClick={() => handleFineTuning('north', 0.001)}>中 (0.001°)</button>
-            <button onClick={() => handleFineTuning('north', 0.01)}>大 (0.01°)</button>
+            <div className="fine-tuning-amounts">
+              <button onClick={() => handleFineTuning('north', 0.0001)}>小 (0.0001°)</button>
+              <button onClick={() => handleFineTuning('north', 0.001)}>中 (0.001°)</button>
+              <button onClick={() => handleFineTuning('north', 0.01)}>大 (0.01°)</button>
+            </div>
           </div>
         </div>
-      </div>
-
+      }
       {/* 設定保存 */}
       <div className="controls-section">
         <h4>設定保存</h4>
@@ -225,39 +233,6 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
         </div>
       </div>
 
-      {/* 保存された設定一覧 */}
-      <div className="controls-section">
-        <h4>保存された設定</h4>
-        <p>保存済み設定数: {savedConfigs.length}</p>
-        {savedConfigs.length > 0 ? (
-          <div className="saved-configs-list">
-            {savedConfigs.map((config) => (
-              <div key={config.id} className="saved-config-item">
-                <div className="config-info">
-                  <div className="config-name">{config.name}</div>
-                  <div className="config-details">
-                    作成: {new Date(config.createdAt).toLocaleDateString()}
-                    {config.updatedAt.getTime() !== config.createdAt.getTime() && (
-                      <span> (更新: {new Date(config.updatedAt).toLocaleDateString()})</span>
-                    )}
-                  </div>
-                </div>
-                <div className="config-actions">
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteConfig(config.id, config.name)}
-                    title="設定を削除"
-                  >
-                    削除
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-configs">保存された設定はありません</p>
-        )}
-      </div>
     </div>
   );
 };

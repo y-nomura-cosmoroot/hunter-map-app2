@@ -157,13 +157,6 @@ export function ConfigManager({ isOpen, onClose }: ConfigManagerProps) {
                   
                   <div className="config-actions">
                     <button
-                      className="load-button"
-                      onClick={() => handleLoadConfig(config)}
-                      disabled={state.isLoading}
-                    >
-                      読み込み
-                    </button>
-                    <button
                       className="delete-button"
                       onClick={() => setShowDeleteConfirm(config.id)}
                       disabled={state.isLoading}
