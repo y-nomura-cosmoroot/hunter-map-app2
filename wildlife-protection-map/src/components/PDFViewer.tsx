@@ -42,8 +42,7 @@ const PDFViewer: React.FC<PDFViewerProps> = React.memo(({
   referencePoints,
   selectedPointIndex
 }) => {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,8 +62,6 @@ const PDFViewer: React.FC<PDFViewerProps> = React.memo(({
     
     documentRef.current = pdf;
     setPdfDocument(pdf);
-    setNumPages(pdf.numPages);
-    setCurrentPage(1);
     setIsLoading(false);
     setError(null);
   }, []);
@@ -105,21 +102,6 @@ const PDFViewer: React.FC<PDFViewerProps> = React.memo(({
   const handleZoomReset = useCallback(() => {
     setScale(1.0);
   }, []);
-
-  // ページナビゲーション
-  const goToPreviousPage = useCallback(() => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
-  }, []);
-
-  const goToNextPage = useCallback(() => {
-    setCurrentPage(prev => Math.min(prev + 1, numPages));
-  }, [numPages]);
-
-  const goToPage = useCallback((pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= numPages) {
-      setCurrentPage(pageNumber);
-    }
-  }, [numPages]);
 
   // 現在のページの基準点を取得（メモ化）
   const currentPagePoints = useMemo(() => 
@@ -179,46 +161,15 @@ const PDFViewer: React.FC<PDFViewerProps> = React.memo(({
 
   return (
     <div className="pdf-viewer">
-      {/* コントロールバー */}
-      <div className="pdf-controls">
-        <div className="page-controls">
-          <button 
-            onClick={goToPreviousPage} 
-            disabled={currentPage <= 1}
-            className="control-btn"
-          >
-            ◀
-          </button>
-          <span className="page-info">
-            <input
-              type="number"
-              value={currentPage}
-              onChange={(e) => goToPage(parseInt(e.target.value) || 1)}
-              min={1}
-              max={numPages}
-              className="page-input"
-            />
-            / {numPages}
-          </span>
-          <button 
-            onClick={goToNextPage} 
-            disabled={currentPage >= numPages}
-            className="control-btn"
-          >
-            ▶
-          </button>
-        </div>
-
-        <div className="zoom-controls">
-          <button onClick={handleZoomOut} className="control-btn">-</button>
-          <span className="zoom-info">{Math.round(scale * 100)}%</span>
-          <button onClick={handleZoomIn} className="control-btn">+</button>
-          <button onClick={handleZoomReset} className="control-btn reset">リセット</button>
-        </div>
-      </div>
-
       {/* PDF表示エリア */}
       <div className="pdf-display-area">
+        {/* ズームコントロール（右端に配置） */}
+        <div className="zoom-controls-overlay">
+          <button onClick={handleZoomIn} className="zoom-btn" title="拡大">+</button>
+          <span className="zoom-info">{Math.round(scale * 100)}%</span>
+          <button onClick={handleZoomOut} className="zoom-btn" title="縮小">-</button>
+          <button onClick={handleZoomReset} className="zoom-btn reset" title="リセット">⟲</button>
+        </div>
         {isLoading && (
           <div className="pdf-loading">
             <div className="spinner"></div>
@@ -282,7 +233,7 @@ const PDFViewer: React.FC<PDFViewerProps> = React.memo(({
         <div className="pdf-help">
           <p>
             📍 基準点 {referencePoints.length + 1}/3 を設定してください。
-            PDF上の特徴的な地点をクリックしてください。
+            PDF上の基準点をクリックしてください。
           </p>
         </div>
       )}

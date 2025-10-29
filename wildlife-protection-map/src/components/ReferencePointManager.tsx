@@ -127,9 +127,9 @@ const ReferencePointManager: React.FC<ReferencePointManagerProps> = ({
         <div className="step-description">
           <p>
             {!pdfPoints[currentIndex] && !mapPoints[currentIndex] && 
-              "PDF上の特徴的な地点をクリックしてください"}
+              "PDF上の基準点をクリックしてください"}
             {pdfPoints[currentIndex] && !mapPoints[currentIndex] && 
-              "対応する地図上の地点をクリックしてください"}
+              "対応する地図上の基準点をクリックしてください"}
             {pdfPoints[currentIndex] && mapPoints[currentIndex] && 
               "基準点ペアが設定されました"}
           </p>

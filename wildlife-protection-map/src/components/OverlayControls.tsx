@@ -16,7 +16,7 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
   savedConfigs,
 }) => {
   console.log('OverlayControls初期化開始:', { overlay, savedConfigs });
-  
+
   const [opacityInput, setOpacityInput] = useState<number>(overlay.opacity);
 
   // オーバーレイが変更されたときに透明度を更新
@@ -36,10 +36,10 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
   const handleFineTuning = (direction: 'north' | 'south' | 'east' | 'west', amount: number = 0.001) => {
     const currentLat = overlay.position.center.lat;
     const currentLng = overlay.position.center.lng;
-    
+
     let newLat = currentLat;
     let newLng = currentLng;
-    
+
     switch (direction) {
       case 'north':
         newLat += amount;
@@ -54,7 +54,7 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
         newLng -= amount;
         break;
     }
-    
+
     console.log(`位置微調整: ${direction}, 現在位置: ${currentLat}, ${currentLng}, 新しい位置: ${newLat}, ${newLng}`);
     onPositionChange(newLat, newLng);
   };
@@ -62,20 +62,21 @@ const OverlayControls: React.FC<OverlayControlsProps> = ({
   return (
     <div className="overlay-controls">
       <h3>オーバーレイ調整</h3>
-      
+
       {/* 基本情報 */}
+      {import.meta.env.VITE_DEBUG_MODE === "TRUE" && 
       <div className="controls-section">
         <h4>基本情報</h4>
         <p><strong>名前:</strong> {overlay.name}</p>
         <p><strong>中心座標:</strong> {overlay.position.center.lat.toFixed(6)}, {overlay.position.center.lng.toFixed(6)}</p>
         <p><strong>作成日時:</strong> {new Date(overlay.createdAt).toLocaleString()}</p>
       </div>
-
-      {/* 透明度調整 */}
+      }
+      {/* 不透明度調整 */}
       <div className="controls-section">
-        <h4>透明度調整</h4>
+        <h4>不透明度調整</h4>
         <div className="opacity-control">
-          <label htmlFor="opacity">透明度: {Math.round(opacityInput * 100)}%</label>
+          <label htmlFor="opacity">不透明度: {Math.round(opacityInput * 100)}%</label>
           <input
             id="opacity"
             type="range"

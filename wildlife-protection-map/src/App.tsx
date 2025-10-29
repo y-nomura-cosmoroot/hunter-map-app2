@@ -193,56 +193,73 @@ function App() {
     >
       <div className="app">
         <header className="app-header">
-          <h1>三重県鳥獣保護区マップ</h1>
-          <p>Wildlife Protection Map</p>
+          <div className="header-content">
+            <div className="header-title">
+              <h1>三重県鳥獣保護区マップ</h1>
+              <p>Wildlife Protection Map</p>
+            </div>
+            <div className="header-controls">
+              <ErrorBoundary>
+                <LocationControls onLocationFound={handleLocationFound} />
+              </ErrorBoundary>
+              <button
+                onClick={() => {
+                  if (state.isPanelVisible) {
+                    // パネルを閉じる時にPDFをリセット
+                    dispatch({ type: 'CLEAR_PDF' });
+                  }
+                  dispatch({ type: 'TOGGLE_PANEL_VISIBILITY' });
+                }}
+                className="btn-header btn-pdf-upload"
+                title={state.isPanelVisible ? 'パネルを閉じてリセット' : 'PDFアップロード'}
+              >
+                {state.isPanelVisible ? '✕ 閉じる' : '📄 PDFアップロード'}
+              </button>
+            </div>
+          </div>
         </header>
         
         <div className="app-body">
-          <aside className="app-sidebar">
+          <aside className={`app-sidebar ${state.isPanelVisible ? 'visible' : 'hidden'}`}>
             <div className="sidebar-content">
-              <h3>操作パネル</h3>
               <div className="step-indicator">
+                {/* ステップ1: PDFアップロード */}
                 <div className={`step ${state.currentStep === STEPS.PDF_UPLOAD ? 'active' : ''}`}>
                   <span className="step-number">1</span>
                   <span className="step-label">PDFアップロード</span>
                 </div>
+
+                {/* ステップ2: 基準点設定 */}
                 <div className={`step ${state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3 ? 'active' : ''}`}>
                   <span className="step-number">2</span>
                   <span className="step-label">基準点設定</span>
                 </div>
-                <div className={`step ${state.currentStep === STEPS.OVERLAY_CREATION ? 'active' : ''}`}>
-                  <span className="step-number">3</span>
-                  <span className="step-label">オーバーレイ</span>
-                </div>
+                {state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3 && (
+                  <div className="step-content">
+                    <ErrorBoundary>
+                      <ReferencePointManager
+                        pdfPoints={state.referencePoints.pdf}
+                        mapPoints={state.referencePoints.map}
+                        currentStep={state.currentStep}
+                        onNextStep={handleNextStep}
+                        onPreviousStep={handlePreviousStep}
+                        onReset={handleReset}
+                      />
+                    </ErrorBoundary>
+                  </div>
+                )}
+
+                {state.currentStep === STEPS.OVERLAY_CREATION && (
+                  <div className="step-content">
+                    <p>オーバーレイを作成中です...</p>
+                  </div>
+                )}
+
+                {/* ステップ4: 調整 */}
                 <div className={`step ${state.currentStep === STEPS.OVERLAY_ADJUSTMENT ? 'active' : ''}`}>
-                  <span className="step-number">4</span>
+                  <span className="step-number">3</span>
                   <span className="step-label">調整</span>
                 </div>
-              </div>
-              <div className="control-panel">
-                {/* 位置情報コントロール */}
-                <ErrorBoundary>
-                  <LocationControls onLocationFound={handleLocationFound} />
-                </ErrorBoundary>
-                
-                {state.currentStep === STEPS.PDF_UPLOAD && (
-                  <p>PDFファイルをアップロードして開始してください。</p>
-                )}
-                {state.currentStep >= STEPS.REFERENCE_POINT_1 && state.currentStep <= STEPS.REFERENCE_POINT_3 && (
-                  <ErrorBoundary>
-                    <ReferencePointManager
-                      pdfPoints={state.referencePoints.pdf}
-                      mapPoints={state.referencePoints.map}
-                      currentStep={state.currentStep}
-                      onNextStep={handleNextStep}
-                      onPreviousStep={handlePreviousStep}
-                      onReset={handleReset}
-                    />
-                  </ErrorBoundary>
-                )}
-                {state.currentStep === STEPS.OVERLAY_CREATION && (
-                  <p>オーバーレイを作成中です...</p>
-                )}
                 {/* 強制的な条件チェック */}
                 {(() => {
                   console.log('レンダリング時の条件チェック:', {
@@ -256,29 +273,36 @@ function App() {
                   if (state.currentStep === STEPS.OVERLAY_ADJUSTMENT && state.overlay) {
                     try {
                       console.log('レンダリング開始...');
-                      const result = (
-                        <div>
-                          <p>デバッグ: OverlayControlsを表示中</p>
-                          <div style={{ padding: '10px', border: '1px solid #ccc', margin: '10px 0' }}>
-                            <h4>オーバーレイ調整</h4>
-                            <p>オーバーレイが正常に作成されました！</p>
-                            <p>オーバーレイ名: {state.overlay.name}</p>
-                            <p>透明度: {state.overlay.opacity}</p>
-                            <p>中心座標: {state.overlay.position.center.lat.toFixed(6)}, {state.overlay.position.center.lng.toFixed(6)}</p>
-                          </div>
-                          <div style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
-                            <p>OverlayControlsコンポーネントをロード中...</p>
-                            <ErrorBoundary>
-                              <OverlayControls
-                                overlay={state.overlay}
-                                onPositionChange={handlePositionChange}
-                                onOpacityChange={handleOpacityChange}
-                                savedConfigs={state.savedConfigs}
-                              />
-                            </ErrorBoundary>
-                          </div>
-                        </div>
+
+                      const overlay = (
+                        <ErrorBoundary>
+                          <OverlayControls
+                            overlay={state.overlay}
+                            onPositionChange={handlePositionChange}
+                            onOpacityChange={handleOpacityChange}
+                            savedConfigs={state.savedConfigs}
+                          />
+                        </ErrorBoundary>
                       );
+                      let result = overlay;
+                      if(import.meta.env.VITE_DEBUG_MODE === "TRUE"){
+                        result = (
+                          <div>
+                            <p>デバッグ: OverlayControlsを表示中</p>
+                            <div style={{ padding: '10px', border: '1px solid #ccc', margin: '10px 0' }}>
+                              <h4>オーバーレイ調整</h4>
+                              <p>オーバーレイが正常に作成されました！</p>
+                              <p>オーバーレイ名: {state.overlay.name}</p>
+                              <p>透明度: {state.overlay.opacity}</p>
+                              <p>中心座標: {state.overlay.position.center.lat.toFixed(6)}, {state.overlay.position.center.lng.toFixed(6)}</p>
+                            </div>
+                            <div style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
+                              <p>OverlayControlsコンポーネントをロード中...</p>
+                              {overlay}
+                            </div>
+                          </div>
+                        );
+                      }
                       console.log('レンダリング完了:', result);
                       return result;
                     } catch (error) {
@@ -295,19 +319,21 @@ function App() {
                   return null;
                 })()}
                 {/* デバッグ情報 */}
+                {import.meta.env.VITE_DEBUG_MODE === "TRUE" &&
                 <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
                   <p>現在のステップ: {state.currentStep}</p>
                   <p>オーバーレイ: {state.overlay ? 'あり' : 'なし'}</p>
                   <p>OVERLAY_ADJUSTMENT: {STEPS.OVERLAY_ADJUSTMENT}</p>
                 </div>
+                }
               </div>
             </div>
           </aside>
           
           <main className="app-main">
             <div className="main-content">
-              <div className="content-area">
-                <div className="pdf-section">
+              <div className={`content-area ${state.isPanelVisible ? 'split-view' : 'map-only'}`}>
+                <div className={`pdf-section ${state.isPanelVisible ? 'visible' : 'hidden'}`}>
                   <h3>PDF表示エリア</h3>
                   <ErrorBoundary>
                     {state.currentStep === STEPS.PDF_UPLOAD ? (

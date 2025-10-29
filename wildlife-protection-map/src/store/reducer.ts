@@ -16,6 +16,7 @@ export const initialState: ApplicationState = {
   locationError: null,
   isLoading: false,
   error: null,
+  isPanelVisible: false, // 初期状態では非表示
 };
 
 // Reducer関数
@@ -237,6 +238,18 @@ export function applicationReducer(
         userLocation: null,
         isLocationLoading: false,
         locationError: null,
+      };
+
+    case 'TOGGLE_PANEL_VISIBILITY':
+      return {
+        ...state,
+        isPanelVisible: !state.isPanelVisible,
+      };
+
+    case 'SET_PANEL_VISIBILITY':
+      return {
+        ...state,
+        isPanelVisible: action.payload,
       };
 
     case 'RESET_STATE':

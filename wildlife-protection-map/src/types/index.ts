@@ -55,6 +55,7 @@ export interface ApplicationState {
   locationError: string | null;
   isLoading: boolean;
   error: string | null;
+  isPanelVisible: boolean; // サイドバーとPDF表示エリアの表示/非表示
 }
 
 // アクションの型定義
@@ -81,6 +82,8 @@ export type ApplicationAction =
   | { type: 'CLEAR_USER_LOCATION' }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'TOGGLE_PANEL_VISIBILITY' }
+  | { type: 'SET_PANEL_VISIBILITY'; payload: boolean }
   | { type: 'RESET_STATE' };
 
 // ステップの定数

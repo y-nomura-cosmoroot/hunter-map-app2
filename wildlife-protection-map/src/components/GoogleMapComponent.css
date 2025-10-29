@@ -154,7 +154,7 @@
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .google-map-container {
-    min-height: 300px;
+    min-height: 500px;
   }
   
   .map-instructions,
