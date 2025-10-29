@@ -345,4 +345,76 @@
     align-items: stretch;
     gap: 10px;
   }
+}/* ストレージ
+設定関連のスタイル */
+.storage-summary {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.storage-summary p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.storage-summary strong {
+  color: #333;
+}
+
+/* 大容量ファイル用の警告スタイル */
+.large-file-warning {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+.large-file-warning strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* ストレージ使用量バーの改善 */
+.storage-bar {
+  position: relative;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.storage-usage {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745 0%, #ffc107 70%, #dc3545 90%);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.storage-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .storage-details {
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .storage-options {
+    gap: 15px;
+  }
+  
+  .storage-breakdown {
+    font-size: 0.8rem;
+  }
 }

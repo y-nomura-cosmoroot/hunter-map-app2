@@ -155,6 +155,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -263,8 +264,8 @@
   color: #495057;
 }
 
-.pdf-section > div:not(h3),
-.map-section > div:not(h3),
+.pdf-section>div:not(h3),
+.map-section>div:not(h3),
 .map-viewer-placeholder {
   flex: 1;
 }
@@ -284,7 +285,7 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
   }
-  
+
   .app-sidebar {
     width: 250px;
   }
@@ -294,26 +295,26 @@
   .app-body {
     flex-direction: column;
   }
-  
+
   .app-sidebar {
     width: 100%;
     order: 2;
   }
-  
+
   .app-main {
     order: 1;
   }
-  
+
   .sidebar-content {
     padding: 1rem;
   }
-  
+
   .step-indicator {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .step {
     flex: 1;
     margin-bottom: 0;
@@ -321,16 +322,16 @@
     flex-direction: column;
     text-align: center;
   }
-  
+
   .step-number {
     margin-right: 0;
     margin-bottom: 0.25rem;
   }
-  
+
   .step-label {
     font-size: 0.8rem;
   }
-  
+
   .content-area {
     min-height: 400px;
   }
@@ -342,21 +343,21 @@
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .header-title {
     text-align: center;
   }
-  
+
   .header-controls {
     width: 100%;
     flex-direction: column;
   }
-  
+
   .content-area.split-view {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
   }
-  
+
   .app-sidebar.hidden {
     transform: translateY(-100%);
   }
@@ -366,16 +367,39 @@
   .app-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .app-header h1 {
     font-size: 1.4rem;
   }
-  
+
   .main-content {
     padding: 1rem;
   }
-  
+
   .content-area {
     gap: 1rem;
   }
+}
+
+/* 設定管理ボタンのスタイル */
+.btn-header.btn-config-manager {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-header.btn-config-manager:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-header.btn-config-manager:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.3);
 }

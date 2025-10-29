@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback, u
 import type { ReactNode } from 'react';
 import type { ApplicationState, ApplicationAction } from '../types';
 import { applicationReducer, initialState } from './reducer';
-import { loadConfigs, saveConfigs } from '../utils/localStorage';
+import { loadConfigs, saveConfigs } from '../utils/simpleStorage';
 import { handleError, reportError, getUserFriendlyMessage } from '../utils/errorHandler';
 import type { OverlayConfig } from '../types';
 
@@ -32,7 +32,9 @@ export function ApplicationProvider({ children }: ApplicationProviderProps) {
     const loadSavedConfigs = async () => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
-        const configs = loadConfigs();
+        const configs = await loadConfigs(); // awaitを追加
+        
+        console.log('Loaded configs from storage:', configs);
         
         // 保存された設定を状態に設定
         dispatch({ type: 'LOAD_SAVED_CONFIGS', payload: configs });
@@ -55,7 +57,7 @@ export function ApplicationProvider({ children }: ApplicationProviderProps) {
     const saveCurrentConfigs = async () => {
       try {
         if (state.savedConfigs.length >= 0) { // 空配列でも保存する
-          saveConfigs(state.savedConfigs);
+          await saveConfigs(state.savedConfigs); // awaitを追加
         }
       } catch (error) {
         const appError = handleError(error, 'ApplicationProvider.saveCurrentConfigs');

@@ -1,5 +1,5 @@
 import './App.css'
-import { useCallback, useMemo, useEffect } from 'react'
+import { useCallback, useMemo, useEffect, useState } from 'react'
 import { useApplicationState, useApplicationDispatch } from './store'
 import { STEPS } from './types'
 import { 
@@ -10,7 +10,8 @@ import {
   OverlayControls,
   ErrorBoundary,
   ErrorNotification,
-  LocationControls
+  LocationControls,
+  ConfigManager
 } from './components'
 import './components/PDFUploader.css'
 import './components/PDFViewer.css'
@@ -22,10 +23,12 @@ import './components/ErrorNotification.css'
 import './components/LocationControls.css'
 import { handleError, reportError } from './utils/errorHandler'
 import { clearPDFCache, getMemoryStats } from './utils/pdfToImage'
+import { debugAppState } from './utils/debug'
 
 function App() {
   const state = useApplicationState();
   const dispatch = useApplicationDispatch();
+  const [isConfigManagerOpen, setIsConfigManagerOpen] = useState(false);
 
   // デバッグ: ステップ変更をログ出力
   useEffect(() => {
@@ -34,6 +37,11 @@ function App() {
     console.log('STEPS.OVERLAY_ADJUSTMENT:', STEPS.OVERLAY_ADJUSTMENT);
     console.log('条件チェック - OVERLAY_CREATION:', state.currentStep === STEPS.OVERLAY_CREATION);
     console.log('条件チェック - OVERLAY_ADJUSTMENT:', state.currentStep === STEPS.OVERLAY_ADJUSTMENT && !!state.overlay);
+    
+    // 詳細なデバッグ情報
+    if (import.meta.env.DEV) {
+      debugAppState(state);
+    }
   }, [state.currentStep, state.overlay]);
 
   // メモリ監視とクリーンアップ
@@ -203,6 +211,13 @@ function App() {
                 <LocationControls onLocationFound={handleLocationFound} />
               </ErrorBoundary>
               <button
+                onClick={() => setIsConfigManagerOpen(true)}
+                className="btn-header btn-config-manager"
+                title="保存された設定を管理"
+              >
+                ⚙️ 設定管理
+              </button>
+              <button
                 onClick={() => {
                   if (state.isPanelVisible) {
                     // パネルを閉じる時にPDFをリセット
@@ -359,6 +374,7 @@ function App() {
                       onMapClick={handleMapClick}
                       referencePoints={state.referencePoints.map}
                       overlay={state.overlay}
+                      activeOverlays={state.activeOverlays}
                       selectedPointIndex={selectedPointIndex}
                       pdfFile={state.currentPDF}
                       pdfPoints={state.referencePoints.pdf}
@@ -379,6 +395,12 @@ function App() {
           onDismiss={handleErrorDismiss}
           autoHide={true}
           autoHideDelay={7000}
+        />
+
+        {/* 設定管理モーダル */}
+        <ConfigManager
+          isOpen={isConfigManagerOpen}
+          onClose={() => setIsConfigManagerOpen(false)}
         />
       </div>
     </ErrorBoundary>

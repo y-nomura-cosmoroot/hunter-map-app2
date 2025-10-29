@@ -158,7 +158,8 @@ async function convertPDFToCanvasInternal(
     await page.render(renderContext).promise;
     
     // CanvasをBase64エンコードされた画像データに変換
-    const imageData = canvas.toDataURL('image/png', 0.8); // 品質を80%に設定してサイズ削減
+    // JPEGで圧縮してサイズを大幅削減（透明度が不要な場合）
+    const imageData = canvas.toDataURL('image/jpeg', 0.7); // JPEG品質70%でサイズ大幅削減
     
     return {
       canvas,

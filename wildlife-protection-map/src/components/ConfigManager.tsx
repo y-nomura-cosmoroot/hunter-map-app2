@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useApplicationState, useApplicationDispatch, useStorageOperations } from '../store/context';
-import { getStorageInfo } from '../utils/localStorage';
+import { useState, useEffect } from 'react';
+import { useApplicationState, useApplicationDispatch } from '../store/context';
+import { getStorageInfo, deleteConfig, clearAllConfigs } from '../utils/simpleStorage';
 import type { OverlayConfig } from '../types';
 import './ConfigManager.css';
 
@@ -12,20 +12,29 @@ interface ConfigManagerProps {
 export function ConfigManager({ isOpen, onClose }: ConfigManagerProps) {
   const state = useApplicationState();
   const dispatch = useApplicationDispatch();
-  const { deleteConfigFromStorage, clearAllConfigs } = useStorageOperations();
   
   const [selectedConfig, setSelectedConfig] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
-  const [storageInfo, setStorageInfo] = useState(getStorageInfo());
+  const [storageInfo, setStorageInfo] = useState<{
+    totalConfigs: number;
+    estimatedSize: number;
+  } | null>(null);
 
   // ストレージ情報を更新
-  const updateStorageInfo = () => {
-    setStorageInfo(getStorageInfo());
+  const updateStorageInfo = async () => {
+    const info = await getStorageInfo();
+    setStorageInfo(info);
   };
+
+  // 初期化時にストレージ情報を取得
+  useEffect(() => {
+    updateStorageInfo();
+  }, []);
 
   // 設定を読み込み
   const handleLoadConfig = (config: OverlayConfig) => {
+    console.log('Loading config:', config);
     dispatch({ type: 'LOAD_CONFIG', payload: config });
     setSelectedConfig(config.id);
     onClose();
@@ -33,16 +42,32 @@ export function ConfigManager({ isOpen, onClose }: ConfigManagerProps) {
 
   // 設定を削除
   const handleDeleteConfig = async (configId: string) => {
-    await deleteConfigFromStorage(configId);
-    setShowDeleteConfirm(null);
-    updateStorageInfo();
+    try {
+      // ストレージから削除
+      await deleteConfig(configId);
+      // 状態も更新
+      dispatch({ type: 'DELETE_CONFIG', payload: configId });
+      setShowDeleteConfirm(null);
+      await updateStorageInfo();
+    } catch (error) {
+      console.error('Failed to delete config:', error);
+      dispatch({ type: 'SET_ERROR', payload: '設定の削除に失敗しました。' });
+    }
   };
 
   // すべての設定をクリア
   const handleClearAll = async () => {
-    await clearAllConfigs();
-    setShowClearAllConfirm(false);
-    updateStorageInfo();
+    try {
+      // ストレージをクリア
+      await clearAllConfigs();
+      // 状態も更新
+      dispatch({ type: 'CLEAR_ALL_CONFIGS' });
+      setShowClearAllConfirm(false);
+      await updateStorageInfo();
+    } catch (error) {
+      console.error('Failed to clear configs:', error);
+      dispatch({ type: 'SET_ERROR', payload: '設定のクリアに失敗しました。' });
+    }
   };
 
   // 日付をフォーマット
@@ -83,21 +108,15 @@ export function ConfigManager({ isOpen, onClose }: ConfigManagerProps) {
 
         {/* ストレージ情報 */}
         <div className="storage-info">
-          <h3>ストレージ使用状況</h3>
-          <div className="storage-stats">
-            <div className="storage-bar">
-              <div 
-                className="storage-usage"
-                style={{ width: `${storageInfo.usagePercentage}%` }}
-              />
+          <h3>保存された設定</h3>
+          {storageInfo ? (
+            <div className="storage-summary">
+              <p>保存済み設定数: <strong>{storageInfo.totalConfigs}</strong></p>
+              <p>使用容量: <strong>{formatFileSize(storageInfo.estimatedSize)}</strong></p>
             </div>
-            <div className="storage-details">
-              <span>使用量: {formatFileSize(storageInfo.storageUsage)}</span>
-              <span>制限: {formatFileSize(storageInfo.storageLimit)}</span>
-              <span>使用率: {storageInfo.usagePercentage}%</span>
-            </div>
-          </div>
-          <p>保存された設定数: {storageInfo.totalConfigs}</p>
+          ) : (
+            <p>情報を読み込み中...</p>
+          )}
         </div>
 
         {/* 設定一覧 */}

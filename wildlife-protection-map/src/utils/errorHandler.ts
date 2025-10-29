@@ -7,6 +7,7 @@ export const ErrorType = {
   STORAGE: 'STORAGE',
   NETWORK: 'NETWORK',
   VALIDATION: 'VALIDATION',
+  FILE_SIZE: 'FILE_SIZE',
   UNKNOWN: 'UNKNOWN',
 } as const;
 

@@ -11,6 +11,7 @@ export const initialState: ApplicationState = {
   currentStep: STEPS.PDF_UPLOAD,
   overlay: null,
   savedConfigs: [],
+  activeOverlays: [],
   userLocation: null,
   isLocationLoading: false,
   locationError: null,
@@ -165,21 +166,26 @@ export function applicationReducer(
       };
 
     case 'LOAD_CONFIG':
-      return {
+      console.log('LOAD_CONFIG reducer called with:', action.payload);
+      const newState = {
         ...state,
         currentPDF: new File([action.payload.pdfFile.data], action.payload.pdfFile.name, {
-          type: 'application/pdf',
+          type: action.payload.pdfFile.type || 'application/pdf',
+          lastModified: action.payload.pdfFile.lastModified || Date.now(),
         }),
         referencePoints: action.payload.referencePoints,
         overlay: action.payload,
         currentStep: STEPS.OVERLAY_ADJUSTMENT,
         error: null,
       };
+      console.log('LOAD_CONFIG new state:', newState);
+      return newState;
 
     case 'DELETE_CONFIG':
       return {
         ...state,
         savedConfigs: state.savedConfigs.filter(config => config.id !== action.payload),
+        activeOverlays: state.activeOverlays.filter(overlay => overlay.id !== action.payload),
         error: null,
       };
 
@@ -187,13 +193,46 @@ export function applicationReducer(
       return {
         ...state,
         savedConfigs: action.payload,
+        activeOverlays: action.payload, // 保存された設定を全て表示
         error: null,
       };
+
+    case 'SET_ACTIVE_OVERLAYS':
+      return {
+        ...state,
+        activeOverlays: action.payload,
+        error: null,
+      };
+
+    case 'TOGGLE_OVERLAY_VISIBILITY':
+      const overlayId = action.payload;
+      const isCurrentlyActive = state.activeOverlays.some(overlay => overlay.id === overlayId);
+      
+      if (isCurrentlyActive) {
+        // オーバーレイを非表示にする
+        return {
+          ...state,
+          activeOverlays: state.activeOverlays.filter(overlay => overlay.id !== overlayId),
+          error: null,
+        };
+      } else {
+        // オーバーレイを表示する
+        const configToShow = state.savedConfigs.find(config => config.id === overlayId);
+        if (configToShow) {
+          return {
+            ...state,
+            activeOverlays: [...state.activeOverlays, configToShow],
+            error: null,
+          };
+        }
+      }
+      return state;
 
     case 'CLEAR_ALL_CONFIGS':
       return {
         ...state,
         savedConfigs: [],
+        activeOverlays: [],
         error: null,
       };
 

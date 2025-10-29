@@ -26,10 +26,19 @@ export interface OverlayConfig {
   pdfFile: {
     name: string;
     data: ArrayBuffer;
+    type: string;
+    size: number;
+    lastModified: number;
   };
   referencePoints: {
     pdf: PDFPoint[];
     map: MapPoint[];
+  };
+  bounds?: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
   };
   position: {
     bounds: any | null; // google.maps.LatLngBounds will be available when Google Maps is loaded
@@ -48,8 +57,9 @@ export interface ApplicationState {
     map: MapPoint[];
   };
   currentStep: number; // 0-5: アップロード→基準点設定(3回)→オーバーレイ→調整
-  overlay: OverlayConfig | null;
-  savedConfigs: OverlayConfig[];
+  overlay: OverlayConfig | null; // 現在作成中のオーバーレイ
+  savedConfigs: OverlayConfig[]; // 保存された設定
+  activeOverlays: OverlayConfig[]; // 地図上に表示中のオーバーレイ
   userLocation: UserLocation | null;
   isLocationLoading: boolean;
   locationError: string | null;
@@ -76,6 +86,8 @@ export type ApplicationAction =
   | { type: 'DELETE_CONFIG'; payload: string }
   | { type: 'LOAD_SAVED_CONFIGS'; payload: OverlayConfig[] }
   | { type: 'CLEAR_ALL_CONFIGS' }
+  | { type: 'SET_ACTIVE_OVERLAYS'; payload: OverlayConfig[] }
+  | { type: 'TOGGLE_OVERLAY_VISIBILITY'; payload: string }
   | { type: 'SET_USER_LOCATION'; payload: UserLocation }
   | { type: 'SET_LOCATION_LOADING'; payload: boolean }
   | { type: 'SET_LOCATION_ERROR'; payload: string | null }

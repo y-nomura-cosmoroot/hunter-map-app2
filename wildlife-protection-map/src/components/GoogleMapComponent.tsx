@@ -20,7 +20,8 @@ import './GoogleMapComponent.css';
 interface GoogleMapComponentProps {
   onMapClick: (lat: number, lng: number) => void;
   referencePoints: MapPoint[];
-  overlay: OverlayConfig | null;
+  overlay: OverlayConfig | null; // 現在作成中のオーバーレイ
+  activeOverlays: OverlayConfig[]; // 表示中のオーバーレイ一覧
   selectedPointIndex: number;
   pdfFile: File | null;
   pdfPoints: PDFPoint[];
@@ -65,6 +66,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   onMapClick,
   referencePoints,
   overlay,
+  activeOverlays,
   selectedPointIndex,
   pdfFile,
   pdfPoints,
@@ -76,6 +78,12 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [overlayImageUrl, setOverlayImageUrl] = useState<string | null>(null);
   const [overlayBounds, setOverlayBounds] = useState<google.maps.LatLngBounds | null>(null);
+  const [activeOverlayData, setActiveOverlayData] = useState<Array<{
+    id: string;
+    imageUrl: string;
+    bounds: google.maps.LatLngBounds;
+    opacity: number;
+  }>>([]);
   const mapRef = useRef<google.maps.Map | null>(null);
   const overlayCreatedRef = useRef<boolean>(false);
   const originalBoundsRef = useRef<google.maps.LatLngBounds | null>(null);
@@ -105,10 +113,169 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     }
   }, [userLocation]);
 
+  // 保存されたオーバーレイを表示する処理
+  useEffect(() => {
+    const displaySavedOverlay = async () => {
+      console.log('displaySavedOverlay called:', { 
+        hasOverlay: !!overlay, 
+        hasPdfFile: !!overlay?.pdfFile, 
+        overlayCreated: overlayCreatedRef.current,
+        overlayId: overlay?.id 
+      });
+      
+      if (!overlay || !overlay.pdfFile || overlayCreatedRef.current) {
+        console.log('displaySavedOverlay early return');
+        return;
+      }
+
+      try {
+        console.log('保存されたオーバーレイを表示中...', overlay);
+        setIsLoading(true);
+        setError(null);
+        overlayCreatedRef.current = true;
+
+        // PDFファイルを再作成
+        const pdfFile = new File([overlay.pdfFile.data], overlay.pdfFile.name, {
+          type: 'application/pdf',
+        });
+
+        // PDFを高品質な画像に変換
+        const pdfImage = await generateHighQualityPDFImage(pdfFile, 1, 2048);
+
+        // 保存された境界情報を使用してGoogle Maps LatLngBounds を作成
+        let bounds: google.maps.LatLngBounds;
+        
+        if (overlay.bounds) {
+          // 新しい形式の境界データ
+          bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(overlay.bounds.south, overlay.bounds.west),
+            new google.maps.LatLng(overlay.bounds.north, overlay.bounds.east)
+          );
+        } else if (overlay.position.bounds) {
+          // 古い形式の境界データ
+          bounds = overlay.position.bounds;
+        } else {
+          // 境界データがない場合は中心点から推定
+          const center = overlay.position.center;
+          const offset = 0.01; // 適当なオフセット
+          bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(center.lat - offset, center.lng - offset),
+            new google.maps.LatLng(center.lat + offset, center.lng + offset)
+          );
+        }
+
+        // 画像URLとバウンドを設定
+        console.log('Setting overlay image and bounds:', { 
+          imageDataLength: pdfImage.imageData.length,
+          bounds: {
+            north: bounds.getNorthEast().lat(),
+            south: bounds.getSouthWest().lat(),
+            east: bounds.getNorthEast().lng(),
+            west: bounds.getSouthWest().lng()
+          }
+        });
+        
+        setOverlayImageUrl(pdfImage.imageData);
+        setOverlayBounds(bounds);
+        originalBoundsRef.current = bounds;
+
+        // マップビューを調整
+        if (mapRef.current) {
+          mapRef.current.fitBounds(bounds);
+        }
+
+        console.log('保存されたオーバーレイ表示完了');
+
+      } catch (err) {
+        console.error('保存されたオーバーレイ表示エラー:', err);
+        overlayCreatedRef.current = false;
+        const appError = handleError(err, 'GoogleMapComponent.displaySavedOverlay');
+        reportError(appError);
+        setError(appError.userMessage);
+        onOverlayError(appError.userMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    displaySavedOverlay();
+  }, [overlay]);
+
+  // アクティブオーバーレイを処理
+  useEffect(() => {
+    const processActiveOverlays = async () => {
+      console.log('Processing active overlays:', activeOverlays);
+      
+      const overlayDataPromises = activeOverlays.map(async (overlayConfig) => {
+        try {
+          // PDFファイルを再作成
+          const pdfFile = new File([overlayConfig.pdfFile.data], overlayConfig.pdfFile.name, {
+            type: 'application/pdf',
+          });
+
+          // PDFを高品質な画像に変換
+          const pdfImage = await generateHighQualityPDFImage(pdfFile, 1, 2048);
+
+          // 境界情報を復元
+          let bounds: google.maps.LatLngBounds;
+          
+          if (overlayConfig.bounds) {
+            bounds = new google.maps.LatLngBounds(
+              new google.maps.LatLng(overlayConfig.bounds.south, overlayConfig.bounds.west),
+              new google.maps.LatLng(overlayConfig.bounds.north, overlayConfig.bounds.east)
+            );
+          } else {
+            // フォールバック: 中心点から推定
+            const center = overlayConfig.position.center;
+            const offset = 0.01;
+            bounds = new google.maps.LatLngBounds(
+              new google.maps.LatLng(center.lat - offset, center.lng - offset),
+              new google.maps.LatLng(center.lat + offset, center.lng + offset)
+            );
+          }
+
+          return {
+            id: overlayConfig.id,
+            imageUrl: pdfImage.imageData,
+            bounds: bounds,
+            opacity: overlayConfig.opacity,
+          };
+        } catch (error) {
+          console.error(`Failed to process overlay ${overlayConfig.id}:`, error);
+          return null;
+        }
+      });
+
+      const overlayData = (await Promise.all(overlayDataPromises)).filter(data => data !== null);
+      setActiveOverlayData(overlayData as any[]);
+    };
+
+    if (activeOverlays.length > 0) {
+      processActiveOverlays();
+    } else {
+      setActiveOverlayData([]);
+    }
+  }, [activeOverlays]);
+
+  // オーバーレイの変更を監視
+  useEffect(() => {
+    console.log('Overlay changed in GoogleMapComponent:', {
+      hasOverlay: !!overlay,
+      overlayId: overlay?.id,
+      overlayName: overlay?.name,
+      hasPdfFile: !!overlay?.pdfFile,
+      pdfFileName: overlay?.pdfFile?.name,
+      hasPosition: !!overlay?.position,
+      hasBounds: !!overlay?.bounds,
+      overlayCreated: overlayCreatedRef.current,
+      activeOverlaysCount: activeOverlays.length
+    });
+  }, [overlay, activeOverlays]);
+
   // オーバーレイ作成処理
   useEffect(() => {
     const createOverlay = async () => {
-      if (!pdfFile || pdfPoints.length !== 3 || referencePoints.length !== 3 || overlayCreatedRef.current) {
+      if (!pdfFile || pdfPoints.length !== 3 || referencePoints.length !== 3 || overlayCreatedRef.current || overlay) {
         return;
       }
 
@@ -156,10 +323,19 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
           pdfFile: {
             name: pdfFile.name,
             data: (await pdfFile.arrayBuffer()).slice(),
+            type: pdfFile.type,
+            size: pdfFile.size,
+            lastModified: pdfFile.lastModified,
           },
           referencePoints: {
             pdf: pdfPoints,
             map: referencePoints,
+          },
+          bounds: {
+            north: geoBounds.north,
+            south: geoBounds.south,
+            east: geoBounds.east,
+            west: geoBounds.west,
           },
           position: {
             bounds: bounds,
@@ -200,11 +376,18 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
 
   // PDFファイルが変更されたときに作成済みフラグをリセット
   useEffect(() => {
+    console.log('PDF file changed, resetting overlay state');
     overlayCreatedRef.current = false;
     setOverlayImageUrl(null);
     setOverlayBounds(null);
     originalBoundsRef.current = null;
   }, [pdfFile]);
+
+  // オーバーレイIDが変更されたときに作成済みフラグをリセット
+  useEffect(() => {
+    console.log('Overlay ID changed, resetting overlay state:', overlay?.id);
+    overlayCreatedRef.current = false;
+  }, [overlay?.id]);
 
   // オーバーレイの位置更新処理
   useEffect(() => {
@@ -294,7 +477,22 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
             />
           )}
 
-          {/* Ground Overlay */}
+          {/* 保存されたオーバーレイ一覧 */}
+          {activeOverlayData.map((overlayData) => (
+            <GroundOverlay
+              key={overlayData.id}
+              url={overlayData.imageUrl}
+              bounds={{
+                north: overlayData.bounds.getNorthEast().lat(),
+                south: overlayData.bounds.getSouthWest().lat(),
+                east: overlayData.bounds.getNorthEast().lng(),
+                west: overlayData.bounds.getSouthWest().lng(),
+              }}
+              opacity={overlayData.opacity}
+            />
+          ))}
+
+          {/* 現在作成中のオーバーレイ */}
           {overlayImageUrl && overlayBounds && (
             <GroundOverlay
               url={overlayImageUrl}
