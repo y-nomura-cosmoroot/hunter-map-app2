@@ -460,11 +460,11 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
               center={{ lat: userLocation.lat, lng: userLocation.lng }}
               radius={userLocation.accuracy}
               options={{
-                fillColor: '#1a73e8',
-                fillOpacity: 0.08,
-                strokeColor: '#1a73e8',
-                strokeOpacity: 0.25,
-                strokeWeight: 1,
+                fillColor: '#dc3545',
+                fillOpacity: 0.12,
+                strokeColor: '#dc3545',
+                strokeOpacity: 0.35,
+                strokeWeight: 2,
               }}
             />
           )}

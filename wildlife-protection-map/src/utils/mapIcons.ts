@@ -102,9 +102,9 @@ export const getCurrentLocationMarkerOptions = (animated: boolean = true): any =
   if (animated) {
     return {
       icon: {
-        url: createCurrentLocationIcon(24, '#1a73e8', '#4285f4'),
-        scaledSize: typeof google !== 'undefined' ? new google.maps.Size(24, 24) : { width: 24, height: 24 },
-        anchor: typeof google !== 'undefined' ? new google.maps.Point(12, 12) : { x: 12, y: 12 },
+        url: createCurrentLocationIcon(26, '#dc3545', '#ff4757'), // 赤系の色に変更、サイズも少し大きく
+        scaledSize: typeof google !== 'undefined' ? new google.maps.Size(26, 26) : { width: 26, height: 26 },
+        anchor: typeof google !== 'undefined' ? new google.maps.Point(13, 13) : { x: 13, y: 13 },
       },
       zIndex: 1000,
       title: '現在位置',
@@ -113,9 +113,9 @@ export const getCurrentLocationMarkerOptions = (animated: boolean = true): any =
   } else {
     return {
       icon: {
-        url: createStaticLocationIcon(20, '#1a73e8'),
-        scaledSize: typeof google !== 'undefined' ? new google.maps.Size(20, 20) : { width: 20, height: 20 },
-        anchor: typeof google !== 'undefined' ? new google.maps.Point(10, 10) : { x: 10, y: 10 },
+        url: createStaticLocationIcon(22, '#dc3545'), // 赤系の色に変更、サイズも少し大きく
+        scaledSize: typeof google !== 'undefined' ? new google.maps.Size(22, 22) : { width: 22, height: 22 },
+        anchor: typeof google !== 'undefined' ? new google.maps.Point(11, 11) : { x: 11, y: 11 },
       },
       zIndex: 1000,
       title: '現在位置',
